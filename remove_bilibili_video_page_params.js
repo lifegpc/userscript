@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         移除 BiliBili 播放页的死🐴参数
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/lifegpc/userscript
 // @version      0.1
 // @description  仅保留t和p的参数
 // @author       lifegpc

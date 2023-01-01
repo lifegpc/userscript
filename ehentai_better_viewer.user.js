@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E-Hentai better viewer
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.1
+// @version      0.1.2
 // @description  Add a viewer to view original picture on website. Also support cache pictures to reduce Image Limit cost.
 // @author       lifegpc
 // @match        https://*.e-hentai.org/s/*/*
@@ -17,7 +17,6 @@
 // @connect      e-hentai.org
 // ==/UserScript==
 GM_addStyle(GM_getResourceText("viewercss"));
-GM_addElement('script', { textContent: GM_getResourceText('viewer') });
 async function fetchData(url) {
     return new Promise((resolve, reject) => {
         GM_xmlhttpRequest({method: 'GET', url, cookie: document.cookie, responseType: 'blob', onabort: reject, onerror: reject, onload: /**@param {{responseHeaders: string}} res*/(res) => {

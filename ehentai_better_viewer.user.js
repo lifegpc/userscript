@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         E-Hentai better viewer
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1
+// @version      0.1.1
 // @description  Add a viewer to view original picture on website. Also support cache pictures to reduce Image Limit cost.
 // @author       lifegpc
 // @match        https://*.e-hentai.org/s/*/*
@@ -33,10 +33,29 @@ async function fetchData(url) {
         }})
     })
 }
-window.addEventListener("DOMContentLoaded", () => {
+let cur_img = null;
+let obs = new MutationObserver((list) => {
+    for (const m of list) {
+        if (m.type == 'childList') {
+            m.removedNodes.forEach(v => {
+                if (cur_img != null && v == cur_img) {
+                    load();
+                    cur_img = null;
+                }
+            })
+        }
+    }
+})
+let load = () => {
     let img = document.getElementById("img");
+    if (img == null) {
+        setTimeout(load, 100);
+        return;
+    }
+    cur_img = img;
     let parent = img.parentElement;
     parent.replaceWith(img);
+    obs.observe(img.parentElement, {'childList': true, 'subtree': true});
     let options = {
         title: () => {
             return document.getElementsByTagName("h1")[0].innerText
@@ -95,4 +114,5 @@ window.addEventListener("DOMContentLoaded", () => {
         await viewer.show();
     };
     img.addEventListener("click", click);
-})
+};
+window.addEventListener("DOMContentLoaded", load);

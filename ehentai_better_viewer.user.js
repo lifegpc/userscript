@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         E-Hentai better viewer
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.2.1
+// @version      0.2.2
 // @description  Add a viewer to view original picture on website.
 // @author       lifegpc
 // @match        https://*.e-hentai.org/s/*/*
+// @match        https://*.exhentai.org/s/*/*
 // @icon         https://e-hentai.org/favicon.ico
 // @grant        GM_getResourceText
 // @grant        GM_addElement

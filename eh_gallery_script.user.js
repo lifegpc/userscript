@@ -1,11 +1,27 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.0
+// @version      0.1.1
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
+// @match        https://*.e-hentai.org/
+// @match        https://*.e-hentai.org/?*
+// @match        https://*.e-hentai.org/watched
+// @match        https://*.e-hentai.org/watched?*
+// @match        https://*.e-hentai.org/popular
+// @match        https://*.e-hentai.org/popular?*
+// @match        https://*.e-hentai.org/favorites.php
+// @match        https://*.e-hentai.org/favorites.php?*
 // @match        https://*.exhentai.org/g/*/*
+// @match        https://*.exhentai.org/
+// @match        https://*.exhentai.org/?*
+// @match        https://*.exhentai.org/watched
+// @match        https://*.exhentai.org/watched?*
+// @match        https://*.exhentai.org/popular
+// @match        https://*.exhentai.org/popular?*
+// @match        https://*.exhentai.org/favorites.php
+// @match        https://*.exhentai.org/favorites.php?*
 // @icon         https://e-hentai.org/favicon.ico
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -13,6 +29,8 @@
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @run-at       document-start
 // ==/UserScript==
+const GALLERY_REG = /e[-x]hentai\.org\/g\/\d+\/[^/]+/;
+const IMG_REG = /e[-x]hentai\.org\/s\/[^/]+\/\d+-\d+/;
 GM_config.init({
     id: 'e-hentai',
     fields: {
@@ -20,29 +38,39 @@ GM_config.init({
             type: 'checkbox',
             label: 'Open image in new tab.',
             default: true
+        },
+        openGalleryInNewTab: {
+            type: 'checkbox',
+            label: 'Open gallery in new tab.',
+            default: true
         }
     },
     events: {
         save: (values) => {
             let openImageInNewTab = GM_config.get("openImageInNewTab");
+            let openGalleryInNewTab = GM_config.get("openGalleryInNewTab");
             let eles = document.getElementsByTagName("a");
             for (let ele of eles) {
-                if (ele.href.match(REG)) {
+                if (ele.href.match(IMG_REG)) {
                     ele.target = openImageInNewTab ? '_blank' : '_self';
+                } else if (ele.href.match(GALLERY_REG)) {
+                    ele.target = openGalleryInNewTab ? '_blank' : '_self';
                 }
             }
         }
     }
 });
-const REG = /e[-x]hentai\.org\/s\/[^/]+\/\d+-\d+/;
 GM_registerMenuCommand("Edit Settings", () => { GM_config.open() }, "e");
 let observer = new MutationObserver((data) => {
     let openImageInNewTab = GM_config.get("openImageInNewTab");
+    let openGalleryInNewTab = GM_config.get("openGalleryInNewTab");
     for (let i of data) {
         let ele = i.target;
         if (ele.tagName == 'A') {
-            if (ele.href.match(REG)) {
+            if (ele.href.match(IMG_REG)) {
                 ele.target = openImageInNewTab ? '_blank' : '_self';
+            } else if (ele.href.match(GALLERY_REG)) {
+                ele.target = openGalleryInNewTab ? '_blank' : '_self';
             }
         }
     }

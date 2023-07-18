@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.2
+// @version      0.1.3
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -13,6 +13,7 @@
 // @match        https://*.e-hentai.org/popular?*
 // @match        https://*.e-hentai.org/favorites.php
 // @match        https://*.e-hentai.org/favorites.php?*
+// @match        https://*.e-hentai.org/tag/*
 // @match        https://*.exhentai.org/g/*/*
 // @match        https://*.exhentai.org/
 // @match        https://*.exhentai.org/?*
@@ -22,6 +23,7 @@
 // @match        https://*.exhentai.org/popular?*
 // @match        https://*.exhentai.org/favorites.php
 // @match        https://*.exhentai.org/favorites.php?*
+// @match        https://*.exhentai.org/tag/*
 // @icon         https://e-hentai.org/favicon.ico
 // @grant        GM_getValue
 // @grant        GM_setValue

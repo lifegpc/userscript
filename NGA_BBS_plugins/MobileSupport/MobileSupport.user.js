@@ -37,6 +37,7 @@
                 this.pluginSettings['showPostReadingRecord'] = false;
             }
         },
+        currentThread: {},
         async renderThreadsFunc($el) {
             if (this.pluginSettings['showPostReadingRecord']) {
                 const postReadingRecord = this.mainScript.getModule('PostReadingRecord');
@@ -53,7 +54,7 @@
                     if (postReadingRecord.pluginSettings['replyCountEnable'] && recordCount > -1 && currentCount > recordCount) {
                         $el.find('.c2 > span[id^=t_pc]').append(`<span class="hld__new-reply-count-${postReadingRecord.pluginSettings['replyCountStyle']}">${currentCount-recordCount}</span>`)
                     }
-                    postReadingRecord.currentThread[tid] = {currentCount}
+                    this.currentThread[tid] = {currentCount}
                 }
             }
         },
@@ -62,9 +63,9 @@
                 const postReadingRecord = this.mainScript.getModule('PostReadingRecord');
                 if (postReadingRecord) {
                     const tid = this.mainScript.getModule('AuthorMark').getQueryString('tid');
-                    const currentLineNo = parseInt($el.find('.postinfot').text().split('#')[1]);
-                    const currentLineAnchor = $el.find('.postinfot').attr('href').split('#')[1]
-                    const maxReadCount = Math.max((postReadingRecord.currentThread?.[tid]?.currentCount || -1), currentLineNo)
+                    const currentLineNo = parseInt($el.find('.postinfot.postoptswb').text().split('#')[1]);
+                    const currentLineAnchor = $el.find('.postinfot.postoptswb').attr('href').split('#')[1]
+                    const maxReadCount = Math.max((this.currentThread?.[tid]?.currentCount || -1), currentLineNo)
                     const record = await postReadingRecord.store.getItem(tid)
                     if (!record || maxReadCount > record.lastReadCount) {
                         await postReadingRecord.store.setItem(tid, {

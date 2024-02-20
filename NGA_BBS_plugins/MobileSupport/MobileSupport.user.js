@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-移动端支持
 // @namespace    https://github.com/lifegpc/userscript
-// @version      1.0.0
+// @version      1.0.1
 // @author       lifegpc
 // @description  支持移动端页面
 // @license      MIT
@@ -27,12 +27,10 @@
         }],
         buttons: [],
         beforeSaveSettingFunc(settings) {
-            console.log(settings);
             const postReadingRecord = this.mainScript.getModule('PostReadingRecord');
             if (!postReadingRecord && settings['showPostReadingRecord']) {
                 return '请先安装帖子浏览记录插件';
             }
-            console.log(postReadingRecord);
         },
         initFunc() {
             if (typeof this.pluginSettings['showPostReadingRecord'] === 'string') {
@@ -60,6 +58,24 @@
             }
         },
         async renderFormsFunc($el) {
+            if (this.pluginSettings['showPostReadingRecord']) {
+                const postReadingRecord = this.mainScript.getModule('PostReadingRecord');
+                if (postReadingRecord) {
+                    const tid = this.mainScript.getModule('AuthorMark').getQueryString('tid');
+                    const currentLineNo = parseInt($el.find('.postinfot').text().split('#')[1]);
+                    const currentLineAnchor = $el.find('.postinfot').attr('href').split('#')[1]
+                    const maxReadCount = Math.max((postReadingRecord.currentThread?.[tid]?.currentCount || -1), currentLineNo)
+                    const record = await postReadingRecord.store.getItem(tid)
+                    if (!record || maxReadCount > record.lastReadCount) {
+                        await postReadingRecord.store.setItem(tid, {
+                            lastReadCount: maxReadCount,
+                            lastReadLineNo: currentLineNo,
+                            lastReadLineAnchor: currentLineAnchor,
+                            lastReadTime: Math.ceil(new Date().getTime() / 1000)
+                        })
+                    }
+                }
+            }
         },
         style: ``
     }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-移动端支持
 // @namespace    https://github.com/lifegpc/userscript
-// @version      1.0.1
+// @version      1.0.2
 // @author       lifegpc
 // @description  支持移动端页面
 // @license      MIT

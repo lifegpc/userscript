@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-移动端支持
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/MobileSupport
-// @version      1.0.3
+// @version      1.0.4
 // @author       lifegpc
 // @description  支持移动端页面
 // @license      MIT
@@ -24,6 +24,11 @@
             key: 'showPostReadingRecord',
             title: '显示帖子浏览记录标记',
             default: false
+        },
+        {
+            key: 'authorMark',
+            title: '标记楼主',
+            default: true
         }],
         buttons: [],
         beforeSaveSettingFunc(settings) {
@@ -35,6 +40,9 @@
         initFunc() {
             if (typeof this.pluginSettings['showPostReadingRecord'] === 'string') {
                 this.pluginSettings['showPostReadingRecord'] = false;
+            }
+            if (typeof this.pluginSettings['authorMark'] === 'string') {
+                this.pluginSettings['authorMark'] = true;
             }
         },
         currentThread: {},
@@ -52,9 +60,9 @@
                         $el.find('.c2 > a').attr('style', markStyle)
                     }
                     if (postReadingRecord.pluginSettings['replyCountEnable'] && recordCount > -1 && currentCount > recordCount) {
-                        $el.find('.c2 > span[id^=t_pc]').append(`<span class="hld__new-reply-count-${postReadingRecord.pluginSettings['replyCountStyle']}">${currentCount-recordCount}</span>`)
+                        $el.find('.c2 > span[id^=t_pc]').append(`<span class="hld__new-reply-count-${postReadingRecord.pluginSettings['replyCountStyle']}">${currentCount - recordCount}</span>`)
                     }
-                    this.currentThread[tid] = {currentCount}
+                    this.currentThread[tid] = { currentCount }
                 }
             }
         },
@@ -77,12 +85,31 @@
                     }
                 }
             }
+            if (this.pluginSettings['authorMark']) {
+                const $ = this.mainScript.libs.$;
+                const authorMark = this.mainScript.getModule('AuthorMark');
+                if (authorMark) {
+                    const author = $('#postauthor0.userlink').text().replace('楼主', '');
+                    const tid = authorMark.getQueryString('tid')
+                    const authorStr = `${tid}:${author}`
+                    if (author && !authorMark.postAuthor.includes(authorStr) && !window.location.href.includes('authorid')) {
+                        authorMark.postAuthor.unshift(authorStr) > 10 && authorMark.postAuthor.pop()
+                        this.mainScript.setValue('hld__NGA_post_author', authorMark.postAuthor.join(','))
+                    }
+                    $el.find('a.b').each(function () {
+                        const name = $(this).attr('hld-mark-before-name') || $(this).text().replace('[', '').replace(']', '')
+                        if (name && authorMark.postAuthor.includes(`${tid}:${name}`)) {
+                            $(this).append('<span class="hld__post-author">楼主</span>')
+                        }
+                    })
+                }
+            }
         },
         style: ``
     }
     registerPlugin(MobileSupport)
 
-})(function(plugin) {
+})(function (plugin) {
     plugin.meta = GM_info.script
     unsafeWindow.ngaScriptPlugins = unsafeWindow.ngaScriptPlugins || []
     unsafeWindow.ngaScriptPlugins.push(plugin)

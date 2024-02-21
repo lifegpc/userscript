@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-移动端支持
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/MobileSupport
-// @version      1.0.5
+// @version      1.0.6
 // @author       lifegpc
 // @description  支持移动端页面
 // @license      MIT
@@ -119,6 +119,8 @@
                 const $ = this.mainScript.libs.$;
                 const markAndBan = this.mainScript.getModule('MarkAndBan');
                 if (markAndBan) {
+                    const currentUid = $el.find("a.userlink").attr("href").split("uid=")[1] + '';
+                    const currentName = $el.find("a.userlink").text().replace('楼主', '');
                     $el.find('a.b').each(function () {
                         const name = $(this).attr('hld-mark-before-name') || $(this).text().replace('[', '').replace(']', '')
                         const uid = ($(this).attr('href') && $(this).attr('href').indexOf('uid=') > -1) ? $(this).attr('href').split('uid=')[1] + '' : ''
@@ -130,10 +132,26 @@
                             $(this).after(marksDom);
                         }
                     })
+                    $el.find(".posterInfoLineB").each(function () {
+                        $(this).prepend(`<a class="cell rep b txtbtnx nobr block_txt_big postbtmb hld__extra-icon hld__mobile_extra-icon" data-type="mark" title="标签此用户" data-name="${currentName}" data-uid="${currentUid}"><svg t="1686732786072" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2385"><path d="M900.64 379.808l-263.072-256.032c-36.448-35.328-105.76-35.392-142.304 0.096l-327.04 319.904c-56.416 54.72-70.72 76.704-70.72 150.976l0 143.936c0 132.768 26.976 192 186.912 192l131.872 0c81.12 0 128.448-46.656 193.952-111.264l290.016-297.696c18.592-17.984 29.248-43.968 29.248-71.264C929.504 423.36 918.976 397.6 900.64 379.808zM323.008 786.752c-52.928 0-96-43.072-96-96s43.072-96 96-96 96 43.072 96 96S375.936 786.752 323.008 786.752z" fill="#3970fe" p-id="2386" data-spm-anchor-id="a313x.7781069.0.i0" class="selected"></path></svg></a>`)
+                    })
                 }
             }
         },
-        style: ``
+        style: `.hld__mobile_extra-icon {
+            background-color: transparent;
+            margin: 0px;
+            border-left-width: 0px;
+            border-left-style: solid;
+            border-color: inherit;
+            padding: 0.625em 1.2em;
+            line-height: 1.8em;
+            display: inline-block;
+        }
+        .hld__mobile_extra-icon svg {
+            height: 1.8em;
+            width: 1.3em;
+        }`
     }
     registerPlugin(MobileSupport)
 

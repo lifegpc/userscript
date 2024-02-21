@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-移动端支持
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/MobileSupport
-// @version      1.0.4
+// @version      1.0.5
 // @author       lifegpc
 // @description  支持移动端页面
 // @license      MIT
@@ -29,6 +29,11 @@
             key: 'authorMark',
             title: '标记楼主',
             default: true
+        },
+        {
+            key: "showRemark",
+            title: "显示标签",
+            default: false
         }],
         buttons: [],
         beforeSaveSettingFunc(settings) {
@@ -43,6 +48,9 @@
             }
             if (typeof this.pluginSettings['authorMark'] === 'string') {
                 this.pluginSettings['authorMark'] = true;
+            }
+            if (typeof this.pluginSettings['showRemark'] === 'string') {
+                this.pluginSettings['showRemark'] = false;
             }
         },
         currentThread: {},
@@ -67,6 +75,9 @@
             }
         },
         async renderFormsFunc($el) {
+            let e = $el.find(".c1");
+            let es = window.getComputedStyle(e[0], null);
+            if (es.display !== 'none') return;
             if (this.pluginSettings['showPostReadingRecord']) {
                 const postReadingRecord = this.mainScript.getModule('PostReadingRecord');
                 if (postReadingRecord) {
@@ -100,6 +111,23 @@
                         const name = $(this).attr('hld-mark-before-name') || $(this).text().replace('[', '').replace(']', '')
                         if (name && authorMark.postAuthor.includes(`${tid}:${name}`)) {
                             $(this).append('<span class="hld__post-author">楼主</span>')
+                        }
+                    })
+                }
+            }
+            if (this.pluginSettings['showRemark']) {
+                const $ = this.mainScript.libs.$;
+                const markAndBan = this.mainScript.getModule('MarkAndBan');
+                if (markAndBan) {
+                    $el.find('a.b').each(function () {
+                        const name = $(this).attr('hld-mark-before-name') || $(this).text().replace('[', '').replace(']', '')
+                        const uid = ($(this).attr('href') && $(this).attr('href').indexOf('uid=') > -1) ? $(this).attr('href').split('uid=')[1] + '' : ''
+                        console.log(uid, name);
+                        const marks = markAndBan.getUserMarks({ name, uid })
+                        if (marks) {
+                            let marksDom = ''
+                            marks.marks.forEach(item => marksDom += `<span ${item.desc ? 'class="hld__help" help="' + item.desc + '"' : 'class="hld__post-author"'} style="color: ${item.text_color};background-color: ${item.bg_color};">${item.mark}</span>`);
+                            $(this).after(marksDom);
                         }
                     })
                 }

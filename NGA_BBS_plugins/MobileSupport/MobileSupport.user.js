@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-移动端支持
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/MobileSupport
-// @version      1.0.7
+// @version      1.0.8
 // @author       lifegpc
 // @description  支持移动端页面
 // @license      MIT
@@ -122,7 +122,6 @@
                     $el.find('a.b').each(function () {
                         const name = $(this).attr('hld-mark-before-name') || $(this).text().replace('[', '').replace(']', '')
                         const uid = ($(this).attr('href') && $(this).attr('href').indexOf('uid=') > -1) ? $(this).attr('href').split('uid=')[1] + '' : ''
-                        console.log(uid, name);
                         const marks = markAndBan.getUserMarks({ name, uid })
                         if (marks) {
                             let marksDom = ''

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-自动同步数据
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/AutoSyncData
-// @version      1.0.0
+// @version      1.0.1
 // @author       lifegpc
 // @description  通过WebDAV自动同步数据
 // @license      MIT
@@ -88,10 +88,10 @@
             if (settings['banListFileName'] == '') {
                 return '黑名单列表文件名不能为空。'
             }
-            if (settings['markListFileName']) {
+            if (settings['markListFileName'] == '') {
                 return '标记名单列表文件名不能为空。'
             }
-            if (settings['metaFileName']) {
+            if (settings['metaFileName'] == '') {
                 return '元数据文件名不能为空。'
             }
         },

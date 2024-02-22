@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-自动同步数据
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/AutoSyncData
-// @version      1.0.2
+// @version      1.0.3
 // @author       lifegpc
 // @description  通过WebDAV自动同步数据
 // @license      MIT
@@ -314,7 +314,7 @@
                     onerror: error => {
                         reject(error);
                         this.buttons.forEach(button => button.$el.removeAttr('disabled'))
-                        this.mainScript.popMsg(`WebDAV请求失败!`, error);
+                        this.mainScript.popMsg(`WebDAV请求失败!${error}`);
                     }
                 })
             })

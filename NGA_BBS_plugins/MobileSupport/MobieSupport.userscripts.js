@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-移动端支持
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/MobileSupport
-// @version      1.0.9
+// @version      1.0.10
 // @author       lifegpc
 // @description  支持移动端页面
 // @license      MIT
@@ -102,7 +102,7 @@
                     const author = $('#postauthor0.userlink').text().replace('楼主', '');
                     const tid = authorMark.getQueryString('tid')
                     const authorStr = `${tid}:${author}`
-                    if (author && !authorMark.postAuthor.includes(authorStr) && !window.location.href.includes('authorid')) {
+                    if (author && !authorMark.postAuthor.includes(authorStr) && ['authorid=', 'pid='].every(k => !window.location.href.includes(k))) {
                         authorMark.postAuthor.unshift(authorStr) > 10 && authorMark.postAuthor.pop()
                         this.mainScript.setValue('hld__NGA_post_author', authorMark.postAuthor.join(','))
                     }

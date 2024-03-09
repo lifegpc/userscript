@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.4
+// @version      0.1.5
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -285,23 +285,26 @@ GM_config.init({
     },
     events: {
         save: (values) => {
-            let openImageInNewTab = GM_config.get("openImageInNewTab");
-            let openGalleryInNewTab = GM_config.get("openGalleryInNewTab");
-            let openMPVInNewTab = GM_config.get("openMPVInNewTab");
-            let eles = document.getElementsByTagName("a");
-            for (let ele of eles) {
-                if (ele.href.match(IMG_REG)) {
-                    ele.target = openImageInNewTab ? '_blank' : '_self';
-                } else if (ele.href.match(GALLERY_REG)) {
-                    ele.target = openGalleryInNewTab ? '_blank' : '_self';
-                } else if (ele.href.match(MPV_REG)) {
-                    ele.target = openMPVInNewTab ? '_blank' : '_self';
-                }
-            }
-            handle_tags();
+            handle_doc();
         }
     }
 });
+async function handle_doc() {
+    let openImageInNewTab = GM_config.get("openImageInNewTab");
+    let openGalleryInNewTab = GM_config.get("openGalleryInNewTab");
+    let openMPVInNewTab = GM_config.get("openMPVInNewTab");
+    let eles = document.getElementsByTagName("a");
+    for (let ele of eles) {
+        if (ele.href.match(IMG_REG)) {
+            ele.target = openImageInNewTab ? '_blank' : '_self';
+        } else if (ele.href.match(GALLERY_REG)) {
+            ele.target = openGalleryInNewTab ? '_blank' : '_self';
+        } else if (ele.href.match(MPV_REG)) {
+            ele.target = openMPVInNewTab ? '_blank' : '_self';
+        }
+    }
+    await handle_tags();
+}
 /**@param {MsgType} level */
 function err_handle(e, basic = "", level = "err") {
     console.error(e);
@@ -472,7 +475,6 @@ let observer = new MutationObserver(async (data) => {
         }
     }
 });
-observer.observe(document, { childList: true, subtree: true });
 let checked_update = false;
 let is_checking_update = false;
 async function check_tags_update() {
@@ -601,3 +603,7 @@ async function handle_tags() {
         }
     }
 }
+window.addEventListener('DOMContentLoaded', async () => {
+    handle_doc();
+    observer.observe(document.body, { childList: true, subtree: true });
+})

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.8
+// @version      0.1.9
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -98,7 +98,7 @@ async function fetch_image(url, referer) {
     let re2 = await GM_fetch(url, { headers: { referer }, responseType: 'arraybuffer' })
     const res = new Response(re2.response, { status: re2.status, statusText: re2.statusText, headers: parse_headers(re2.responseHeaders) });
     if (re2.status == 200) {
-        cache.put(url, res);
+        cache.put(url, res.clone());
     }
     return res;
 }

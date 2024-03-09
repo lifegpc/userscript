@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.5
+// @version      0.1.6
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -604,6 +604,6 @@ async function handle_tags() {
     }
 }
 window.addEventListener('DOMContentLoaded', async () => {
-    handle_doc();
+    await handle_doc();
     observer.observe(document.body, { childList: true, subtree: true });
 })

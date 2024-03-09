@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.11
+// @version      0.1.12
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -67,6 +67,7 @@ let storage = navigator.storage || globalThis['WorkerNavigator']['storage'];
 const BLACK_LIST_HOST = [
     "gss2.bdstatic.com",
     "8.blog.xuite.net",
+    "s16.picimge.com",
 ];
 const REFERER_NEED_HOST = {
     "tva1.sinaimg.cn": "https://www.weibo.com",

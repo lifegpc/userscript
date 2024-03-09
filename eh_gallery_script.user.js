@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.9
+// @version      0.1.10
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -405,6 +405,7 @@ GM_addStyle(`
 .egs__msg-err{background:#c33}
 .egs__msg-warn{background:#FF9900}
 td.tc{text-wrap:nowrap}
+.tippy-content p{white-space:break-spaces;color:black!important}
 `)
 GM_addStyle(GM_getResourceText("s"));
 /**
@@ -630,7 +631,7 @@ async function handle_tags() {
         if (enableTagTranslation) {
             let otag = i.getAttribute('otag');
             if (otag) continue;
-            const t = i.id ? replaceAll(e.id.split("td_")[1], '_', ' ') : i.title;
+            const t = i.id ? replaceAll(i.id.split("td_")[1], '_', ' ') : i.title;
             if (!t) continue;
             const value = await get_tag(t);
             i.setAttribute('otag', t);

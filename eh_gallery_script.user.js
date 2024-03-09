@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.6
+// @version      0.1.7
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -53,12 +53,14 @@ let need_reinit = false;
 let storage = navigator.storage || globalThis['WorkerNavigator']['storage'];
 const BLACK_LIST_HOST = [
     "tva1.sinaimg.cn",
-    "img.moegirl.org.cn",
 ];
 
 function filter_html(html) {
     let doc = (new DOMParser).parseFromString(html, "text/html");
-    doc.querySelectorAll('a').forEach(a => a.setAttribute('target', '_blank'));
+    doc.querySelectorAll('a').forEach((a) => {
+        a.target = "_blank";
+        a.referrerPolicy = "no-referrer";
+    });
     doc.querySelectorAll('img[src="#"]').forEach((img) => {
         let title = img.title;
         try {
@@ -75,7 +77,10 @@ function filter_html(html) {
             if (BLACK_LIST_HOST.includes(u.host)) {
                 console.log("Remove blacklist URL: ", u.toString());
                 img.remove();
+                return;
             }
+            img.referrerPolicy = "no-referrer";
+            img.style.maxWidth = "380px";
         } catch (_) {}
     })
     return doc.body.innerHTML;
@@ -94,6 +99,7 @@ function filter_html2(html) {
     })
     doc.querySelectorAll('img').forEach((img) => {
         img.style.height = "12px";
+        img.referrerPolicy = "no-referrer";
     })
     return doc.body.innerHTML;
 }
@@ -280,7 +286,7 @@ GM_config.init({
         enableTagTranslation: {
             type: 'checkbox',
             label: 'Enable tag translation.',
-            default: false
+            default: true
         }
     },
     events: {

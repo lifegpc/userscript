@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.10
+// @version      0.1.11
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -65,6 +65,8 @@ let db = undefined;
 let need_reinit = false;
 let storage = navigator.storage || globalThis['WorkerNavigator']['storage'];
 const BLACK_LIST_HOST = [
+    "gss2.bdstatic.com",
+    "8.blog.xuite.net",
 ];
 const REFERER_NEED_HOST = {
     "tva1.sinaimg.cn": "https://www.weibo.com",
@@ -102,7 +104,7 @@ async function fetch_image(url, referer) {
     }
     return res;
 }
-async function filter_html(html) {
+async function filter_html(html, tag) {
     let doc = (new DOMParser).parseFromString(html, "text/html");
     doc.querySelectorAll('a').forEach((a) => {
         a.target = "_blank";
@@ -124,14 +126,18 @@ async function filter_html(html) {
             if (REFERER_NEED_HOST[u.host]) {
                 const loadRefererImages = GM_config.get("loadRefererImages");
                 if (loadRefererImages == "remove") {
+                    console.log(tag);
                     console.log("Remove referer needed URL: ", u.toString());
                     img.remove();
                     return;
                 } else {
                     const re = await fetch_image(img.src, REFERER_NEED_HOST[u.host]);
                     if (re.status == 200) {
+                        if (!img.title) img.title = img.src;
+                        img.setAttribute('origin_src', img.src);
                         img.src = URL.createObjectURL(await re.blob());
                     } else {
+                        console.log(tag);
                         console.error("Failed to fetch image: ", re.status, re.statusText);
                         img.remove()
                         return;
@@ -139,6 +145,7 @@ async function filter_html(html) {
                 }
             }
             if (BLACK_LIST_HOST.includes(u.host)) {
+                console.log(tag);
                 console.log("Remove blacklist URL: ", u.toString());
                 img.remove();
                 return;
@@ -149,7 +156,7 @@ async function filter_html(html) {
     })
     return doc.body.innerHTML;
 }
-function filter_html2(html) {
+async function filter_html2(html, tag) {
     let doc = (new DOMParser).parseFromString(html, "text/html");
     doc.querySelectorAll('img[src="#"]').forEach((img) => {
         let title = img.title;
@@ -161,7 +168,37 @@ function filter_html2(html) {
             img.remove();
         }
     })
-    doc.querySelectorAll('img').forEach((img) => {
+    await asyncForEach(doc.querySelectorAll('img'), async (img) => {
+        try {
+            let u = new URL(img.src);
+            if (REFERER_NEED_HOST[u.host]) {
+                const loadRefererImages = GM_config.get("loadRefererImages");
+                if (loadRefererImages == "remove") {
+                    console.log(tag);
+                    console.log("Remove referer needed URL: ", u.toString());
+                    img.remove();
+                    return;
+                } else {
+                    const re = await fetch_image(img.src, REFERER_NEED_HOST[u.host]);
+                    if (re.status == 200) {
+                        if (!img.title) img.title = img.src;
+                        img.setAttribute('origin_src', img.src);
+                        img.src = URL.createObjectURL(await re.blob());
+                    } else {
+                        console.log(tag);
+                        console.error("Failed to fetch image: ", re.status, re.statusText);
+                        img.remove()
+                        return;
+                    }
+                }
+            }
+            if (BLACK_LIST_HOST.includes(u.host)) {
+                console.log(tag);
+                console.log("Remove blacklist URL: ", u.toString());
+                img.remove();
+                return;
+            }
+        } catch (_) { }
         img.style.height = "12px";
         img.referrerPolicy = "no-referrer";
     })
@@ -467,7 +504,7 @@ let observer = new MutationObserver(async (data) => {
                         }
                         if (html) {
                             e.setAttribute("tippy-id", set_instance(tippy(e, {
-                                content: await filter_html(html),
+                                content: await filter_html(html, { t, value }),
                                 allowHTML: true,
                                 interactive: true,
                                 theme: 'light-border',
@@ -505,7 +542,7 @@ let observer = new MutationObserver(async (data) => {
                     const value = await get_tag(t);
                     e.setAttribute('otag', t);
                     if (value) {
-                        const name = filter_html2(replaceAll(marked.parse(value.name), /<\/?p>/, ''));
+                        const name = await filter_html2(replaceAll(marked.parse(value.name), /<\/?p>/, ''), {t, value});
                         if (e.id) {
                             e.children[0].innerHTML = name;
                         } else {
@@ -520,7 +557,7 @@ let observer = new MutationObserver(async (data) => {
                         }
                         if (html) {
                             e.setAttribute("tippy-id", set_instance(tippy(e, {
-                                content: await filter_html(html),
+                                content: await filter_html(html, { t, value }),
                                 allowHTML: true,
                                 interactive: true,
                                 theme: 'light-border',
@@ -602,7 +639,7 @@ async function handle_tags() {
                 }
                 if (html) {
                     group.setAttribute("tippy-id", set_instance(tippy(group, {
-                        content: await filter_html(html),
+                        content: await filter_html(html, { t, value }),
                         allowHTML: true,
                         interactive: true,
                         theme: 'light-border',
@@ -636,7 +673,7 @@ async function handle_tags() {
             const value = await get_tag(t);
             i.setAttribute('otag', t);
             if (value) {
-                const name = filter_html2(replaceAll(marked.parse(value.name), /<\/?p>/, ''));
+                const name = await filter_html2(replaceAll(marked.parse(value.name), /<\/?p>/, ''), {t, value});
                 if (i.id) {
                     i.children[0].innerHTML = name;
                 } else {
@@ -651,7 +688,7 @@ async function handle_tags() {
                 }
                 if (html) {
                     i.setAttribute("tippy-id", set_instance(tippy(i, {
-                        content: await filter_html(html),
+                        content: await filter_html(html, { t, value }),
                         allowHTML: true,
                         interactive: true,
                         theme: 'light-border',

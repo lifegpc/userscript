@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.7
+// @version      0.1.8
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -37,9 +37,22 @@
 // @require      https://unpkg.com/@popperjs/core@2
 // @require      https://unpkg.com/tippy.js@6
 // @resource s   https://unpkg.com/tippy.js@6/themes/light-border.css
-// @run-at       document-start
+// @run-at       document-end
 // @connect      raw.githubusercontent.com
+// @connect      tva1.sinaimg.cn
 // ==/UserScript==
+/**
+ * @template T,V
+ * @param {ArrayLike<T>} arr
+ * @param {(this: V | undefined, element: T, index: number, array: ArrayLike<T>) => Promise<void>} callback
+ * @param {V | undefined} thisArg
+ * @returns {Promise<void>}
+ */
+async function asyncForEach(arr, callback, thisArg = undefined) {
+    for (let i = 0; i < arr.length; i++) {
+        await callback.apply(thisArg, [arr[i], i, arr]);
+    }
+}
 function replaceAll(s, pattern, replacement) {
     return s.split(pattern).join(replacement);
 }
@@ -52,10 +65,44 @@ let db = undefined;
 let need_reinit = false;
 let storage = navigator.storage || globalThis['WorkerNavigator']['storage'];
 const BLACK_LIST_HOST = [
-    "tva1.sinaimg.cn",
 ];
-
-function filter_html(html) {
+const REFERER_NEED_HOST = {
+    "tva1.sinaimg.cn": "https://www.weibo.com",
+};
+/**@type {Cache?} */
+let cache = null;
+async function get_cache() {
+    if (cache) return cache;
+    cache = await caches.open('eh_tag_img');
+    return cache;
+}
+/**
+ * @param {string} headers
+ */
+function parse_headers(headers) {
+    const l = headers.split('\r\n');
+    const re = {};
+    for (const i of l) {
+        if (!i) continue;
+        const [k, v] = i.split(': ');
+        re[k] = v;
+    }
+    return re;
+}
+async function fetch_image(url, referer) {
+    let cache = await get_cache();
+    let re = await cache.match(url);
+    if (re) {
+        return re;
+    }
+    let re2 = await GM_fetch(url, { headers: { referer }, responseType: 'arraybuffer' })
+    const res = new Response(re2.response, { status: re2.status, statusText: re2.statusText, headers: parse_headers(re2.responseHeaders) });
+    if (re2.status == 200) {
+        cache.put(url, res);
+    }
+    return res;
+}
+async function filter_html(html) {
     let doc = (new DOMParser).parseFromString(html, "text/html");
     doc.querySelectorAll('a').forEach((a) => {
         a.target = "_blank";
@@ -71,9 +118,26 @@ function filter_html(html) {
             img.remove();
         }
     })
-    doc.querySelectorAll('img').forEach((img) => {
+    await asyncForEach(doc.querySelectorAll('img'), async (img) => {
         try {
             let u = new URL(img.src);
+            if (REFERER_NEED_HOST[u.host]) {
+                const loadRefererImages = GM_config.get("loadRefererImages");
+                if (loadRefererImages == "remove") {
+                    console.log("Remove referer needed URL: ", u.toString());
+                    img.remove();
+                    return;
+                } else {
+                    const re = await fetch_image(img.src, REFERER_NEED_HOST[u.host]);
+                    if (re.status == 200) {
+                        img.src = URL.createObjectURL(await re.blob());
+                    } else {
+                        console.error("Failed to fetch image: ", re.status, re.statusText);
+                        img.remove()
+                        return;
+                    }
+                }
+            }
             if (BLACK_LIST_HOST.includes(u.host)) {
                 console.log("Remove blacklist URL: ", u.toString());
                 img.remove();
@@ -81,7 +145,7 @@ function filter_html(html) {
             }
             img.referrerPolicy = "no-referrer";
             img.style.maxWidth = "380px";
-        } catch (_) {}
+        } catch (_) { }
     })
     return doc.body.innerHTML;
 }
@@ -216,7 +280,7 @@ function get_tag(tag) {
     })
 }
 /**
- * @typedef {{method?: string, headers?: Record<string, string>, data?: string|Blob|File|FormData|URLSearchParams, redirect?: RequestRedirect}} FetchOptions
+ * @typedef {{method?: string, headers?: Record<string, string>, data?: string|Blob|File|FormData|URLSearchParams, redirect?: RequestRedirect, responseType: XMLHttpRequestResponseType}} FetchOptions
  * @typedef {{finalUrl: string, readyState: number, status: number, statusText: string, responseHeaders: string, response: any, responseText: string}} FetchResponse
  * @param {string|URL} url
  * @param {FetchOptions | undefined} options
@@ -231,6 +295,7 @@ function GM_fetch(url, options = undefined) {
             headers: options?.headers,
             data: options?.data,
             redirect: options?.redirect,
+            responseType: options?.responseType,
             onabort: () => {
                 reject("aborted.");
             },
@@ -287,6 +352,12 @@ GM_config.init({
             type: 'checkbox',
             label: 'Enable tag translation.',
             default: true
+        },
+        loadRefererImages: {
+            type: 'radio',
+            label: 'How to load referer needed images:',
+            options: ['GM_xmlhttpRequest', 'remove'],
+            default: 'remove'
         }
     },
     events: {
@@ -395,7 +466,7 @@ let observer = new MutationObserver(async (data) => {
                         }
                         if (html) {
                             e.setAttribute("tippy-id", set_instance(tippy(e, {
-                                content: filter_html(html),
+                                content: await filter_html(html),
                                 allowHTML: true,
                                 interactive: true,
                                 theme: 'light-border',
@@ -448,7 +519,7 @@ let observer = new MutationObserver(async (data) => {
                         }
                         if (html) {
                             e.setAttribute("tippy-id", set_instance(tippy(e, {
-                                content: filter_html(html),
+                                content: await filter_html(html),
                                 allowHTML: true,
                                 interactive: true,
                                 theme: 'light-border',
@@ -475,7 +546,7 @@ let observer = new MutationObserver(async (data) => {
                             e.removeAttribute("tippy-id");
                         }
                     }
-                
+
                 }
             }
         }
@@ -530,7 +601,7 @@ async function handle_tags() {
                 }
                 if (html) {
                     group.setAttribute("tippy-id", set_instance(tippy(group, {
-                        content: filter_html(html),
+                        content: await filter_html(html),
                         allowHTML: true,
                         interactive: true,
                         theme: 'light-border',
@@ -579,7 +650,7 @@ async function handle_tags() {
                 }
                 if (html) {
                     i.setAttribute("tippy-id", set_instance(tippy(i, {
-                        content: filter_html(html),
+                        content: await filter_html(html),
                         allowHTML: true,
                         interactive: true,
                         theme: 'light-border',

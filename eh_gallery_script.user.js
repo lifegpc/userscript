@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.12
+// @version      0.1.13
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -460,7 +460,7 @@ function popMsg(msg, type = "ok") {
     setTimeout(() => { $msg.remove() }, type == 'ok' ? 2500 : 5500)
 }
 const instances = {};
-let insid = 0;
+let insid = 1;
 function set_instance(ins) {
     instances[insid] = ins;
     return insid++;
@@ -548,6 +548,7 @@ let observer = new MutationObserver(async (data) => {
                             e.children[0].innerHTML = name;
                         } else {
                             e.innerHTML = name;
+                            e.title = '';
                         }
                         let html = "";
                         if (value.intro) {
@@ -576,6 +577,7 @@ let observer = new MutationObserver(async (data) => {
                             e.children[0].innerText = otag;
                         } else {
                             e.textContent = otag;
+                            e.title = otag;
                         }
                         e.removeAttribute('otag');
                         let id = e.getAttribute("tippy-id");
@@ -679,6 +681,7 @@ async function handle_tags() {
                     i.children[0].innerHTML = name;
                 } else {
                     i.innerHTML = name;
+                    i.title = '';
                 }
                 let html = "";
                 if (value.intro) {
@@ -707,6 +710,7 @@ async function handle_tags() {
                     i.children[0].innerText = otag;
                 } else {
                     i.textContent = otag;
+                    i.title = otag;
                 }
                 i.removeAttribute('otag');
                 let id = i.getAttribute("tippy-id");

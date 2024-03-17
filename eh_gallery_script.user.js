@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.14
+// @version      0.1.15
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -15,6 +15,7 @@
 // @match        https://*.e-hentai.org/favorites.php?*
 // @match        https://*.e-hentai.org/tag/*
 // @match        https://*.e-hentai.org/uploader/*
+// @match        https://*.e-hentai.org/mytags
 // @match        https://*.exhentai.org/g/*/*
 // @match        https://*.exhentai.org/
 // @match        https://*.exhentai.org/?*
@@ -26,6 +27,7 @@
 // @match        https://*.exhentai.org/favorites.php?*
 // @match        https://*.exhentai.org/tag/*
 // @match        https://*.exhentai.org/uploader/*
+// @match        https://*.exhentai.org/mytags
 // @icon         https://e-hentai.org/favicon.ico
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
@@ -540,13 +542,13 @@ let observer = new MutationObserver(async (data) => {
                 if (enableTagTranslation) {
                     let otag = e.getAttribute('otag');
                     if (otag) continue;
-                    const t = e.id ? replaceAll(e.id.split("td_")[1], '_', ' ') : e.title;
+                    const t = e.id.startsWith("td_") ? replaceAll(e.id.split("td_")[1], '_', ' ') : e.title;
                     if (!t) continue;
                     const value = await get_tag(t);
                     e.setAttribute('otag', t);
                     if (value) {
                         const name = await filter_html2(replaceAll(marked.parse(value.name), /<\/?p>/, ''), {t, value});
-                        if (e.id) {
+                        if (e.id.startsWith("td_")) {
                             e.children[0].innerHTML = name;
                         } else {
                             e.innerHTML = name;
@@ -575,7 +577,7 @@ let observer = new MutationObserver(async (data) => {
                     let tag = e.getAttribute('otag');
                     if (tag) {
                         let otag = tag.split(":")[1];
-                        if (e.id) {
+                        if (e.id.startsWith("td_")) {
                             e.children[0].innerText = otag;
                         } else {
                             e.textContent = otag;
@@ -589,8 +591,52 @@ let observer = new MutationObserver(async (data) => {
                             e.removeAttribute("tippy-id");
                         }
                     }
-
                 }
+            } else if (e.id == "tagname_newtagcomplete-list") {
+                await asyncForEach(e.children, async (e) => {
+                    if (enableTagTranslation) {
+                        let otag = e.getAttribute('otag');
+                        if (otag) return;
+                        const t = replaceAll(e.getAttribute("data-value"), "_", " ");
+                        if (!t) return;
+                        const value = await get_tag(t);
+                        e.setAttribute('otag', e.innerHTML);
+                        if (value) {
+                            const name = await filter_html2(replaceAll(marked.parse(value.name), /<\/?p>/, ''), {t, value});
+                            e.innerHTML = name;
+                            let html = "";
+                            if (value.intro) {
+                                html += marked.parse(value.intro);
+                            }
+                            if (value.links) {
+                                html += marked.parse(value.links);
+                            }
+                            if (html) {
+                                e.setAttribute("tippy-id", set_instance(tippy(e, {
+                                    content: await filter_html(html, { t, value }),
+                                    allowHTML: true,
+                                    interactive: true,
+                                    theme: 'light-border',
+                                    placement: 'right-start',
+                                    maxWidth: 400,
+                                    delay: [500, 0]
+                                })));
+                            }
+                        }
+                    } else {
+                        let tag = e.getAttribute('otag');
+                        if (tag) {
+                            e.innerHTML = tag;
+                            e.removeAttribute('otag');
+                            let id = e.getAttribute("tippy-id");
+                            if (id) {
+                                instances[id].destroy();
+                                delete instances[id];
+                                e.removeAttribute("tippy-id");
+                            }
+                        }
+                    }
+                })
             }
         }
     }
@@ -673,13 +719,13 @@ async function handle_tags() {
         if (enableTagTranslation) {
             let otag = i.getAttribute('otag');
             if (otag) continue;
-            const t = i.id ? replaceAll(i.id.split("td_")[1], '_', ' ') : i.title;
+            const t = i.id.startsWith("td_") ? replaceAll(i.id.split("td_")[1], '_', ' ') : i.title;
             if (!t) continue;
             const value = await get_tag(t);
             i.setAttribute('otag', t);
             if (value) {
                 const name = await filter_html2(replaceAll(marked.parse(value.name), /<\/?p>/, ''), {t, value});
-                if (i.id) {
+                if (i.id.startsWith("td_")) {
                     i.children[0].innerHTML = name;
                 } else {
                     i.innerHTML = name;
@@ -708,7 +754,7 @@ async function handle_tags() {
             let tag = i.getAttribute('otag');
             if (tag) {
                 let otag = tag.split(":")[1];
-                if (i.id) {
+                if (i.id.startsWith("td_")) {
                     i.children[0].innerText = otag;
                 } else {
                     i.textContent = otag;
@@ -727,5 +773,5 @@ async function handle_tags() {
 }
 window.addEventListener('DOMContentLoaded', async () => {
     await handle_doc();
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true,  });
 })

@@ -11,6 +11,7 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_setClipboard
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @icon         https://u2.dmhy.org/favicon.ico
 // ==/UserScript==
 await GM_config.init({
     id: 'u2',

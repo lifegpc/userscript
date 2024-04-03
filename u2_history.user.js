@@ -2,10 +2,11 @@
 // @name         保存个人说明历史
 // @namespace    https://github.com/lifegpc/userscript
 // @version      0.0.1
-// @description  保存个人说明历史
+// @description  保存幼儿园个人说明历史
 // @author       lifegpc
 // @match        https://u2.dmhy.org/usercp.php?action=personal*
 // @icon         https://u2.dmhy.org/favicon.ico
+// @license      MIT
 // ==/UserScript==
 /**@type {IDBDatabase} */
 let db = undefined;
@@ -80,6 +81,7 @@ async function save_info(time, info) {
     return await db_handle(db => db.transaction('info', 'readwrite').objectStore('info').put({ time, info }));
 }
 async function render_page() {}
+(async function() {
 let times = await get_all_info_keys();
 let textarea = document.querySelector('textarea[name="info"]');
 let submit = document.querySelector('input[type="submit"]');
@@ -222,3 +224,4 @@ submit.addEventListener('click', async () => {
         await save_info(new Date, info);
     }
 })
+})();

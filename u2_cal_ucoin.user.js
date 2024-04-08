@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         计算 UCoin 获取量
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.1
+// @version      0.0.2
 // @description  仅支持计算 体积(B)、数量(D)
 // @author       lifegpc
 // @match        https://u2.dmhy.org/userdetails.php?*
@@ -56,8 +56,10 @@ let observer = new MutationObserver((records) => {
                         down = 0;
                         break;
                     case "pro_custom":
-                        up = parseFloat(ov.querySelector('img[class="arrowup"]').nextElementSibling.innerText);
-                        down = parseFloat(ov.querySelector('img[class="arrowdown"]').nextElementSibling.innerText);
+                        if (ov.querySelector('img[class="arrowup"]'))
+                            up = parseFloat(ov.querySelector('img[class="arrowup"]').nextElementSibling.innerText);
+                        if (ov.querySelector('img[class="arrowdown"]'))
+                            down = parseFloat(ov.querySelector('img[class="arrowdown"]').nextElementSibling.innerText);
                         break;
                     default:
                         console.warn("Unknown class:", ft.className);

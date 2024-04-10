@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         计算 UCoin 获取量
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.4
+// @version      0.0.5
 // @description  仅支持计算 体积(B)、数量(D)
 // @author       lifegpc
 // @match        https://u2.dmhy.org/userdetails.php?*
@@ -99,7 +99,7 @@ let observer = new MutationObserver((records) => {
             }
             let dsum = rows.length * d;
             let sum = bsum + dsum;
-            let result = `共计 ${sum.toFixed(3)}/h (${(sum * 24).toFixed(3)}/d)：体积 ${bsum.toFixed(3)}/h (${(bsum * 24).toFixed(3)}/d)，数量 ${dsum.toFixed(1)}/h (${(dsum * 24).toFixed(3)}/d)`;
+            let result = `共计 ${sum.toFixed(3)}/h (${(sum * 24).toFixed(3)}/d)：体积 ${bsum.toFixed(3)}/h (${(bsum * 24).toFixed(3)}/d)，数量 ${dsum.toFixed(1)}/h (${(dsum * 24).toFixed(1)}/d)`;
             if (warn > 0) {
                 result += `（警告：${warn} 个种子计算可能不准确）`;
             }

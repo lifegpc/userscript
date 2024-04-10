@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         计算 UCoin 获取量
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.3
+// @version      0.0.4
 // @description  仅支持计算 体积(B)、数量(D)
 // @author       lifegpc
 // @match        https://u2.dmhy.org/userdetails.php?*
@@ -118,7 +118,7 @@ let observer = new MutationObserver((records) => {
                 e.insertBefore(span2, br);
             } else if (Date.now() - last_updated > MAX_CACHE_TIME) {
                 let span2 = document.createElement("span");
-                span2.innerHTML = `S<sub>0</sub>值已经过期${all_warn}`;
+                span2.innerHTML = `S<sub>0</sub>值上次更新于${(new Date(last_updated)).toLocaleString()}，${all_warn}`;
                 e.insertBefore(document.createElement('br'), br);
                 e.insertBefore(span2, br);
             }

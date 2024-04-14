@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         计算 UCoin 获取量
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.5
+// @version      0.0.6
 // @description  仅支持计算 体积(B)、数量(D)
 // @author       lifegpc
 // @match        https://u2.dmhy.org/userdetails.php?*
@@ -51,6 +51,7 @@ let observer = new MutationObserver((records) => {
             let warn = 0;
             let br = e.querySelector("br");
             let rows = e.querySelectorAll('table:not([class~="torrentname"]) > tbody > tr:not(:first-child)');
+            const ids = new Set();
             for (let row of rows) {
                 let cells = row.children;
                 let size = parse_size(cells[2].innerText);
@@ -58,6 +59,10 @@ let observer = new MutationObserver((records) => {
                 const cat = parseInt(new URL(cells[0].querySelector('a').href).searchParams.get("cat"));
                 let Pmin = ONE_CAT.includes(cat) ? 1 : 0.5;
                 const ov = cells[1].querySelector("td.overflow-control");
+                const id = (new URL(cells[1].querySelector("td > a").href)).searchParams.get("id");
+                if (id) {
+                    ids.add(id);
+                }
                 const ft = ov.childNodes[1];
                 let up = 1;
                 let down = 1;
@@ -97,7 +102,7 @@ let observer = new MutationObserver((records) => {
                 const P = Math.max(Pmin, Math.max(2 - up, 0) * Math.min(down, 1));
                 bsum += P * B;
             }
-            let dsum = rows.length * d;
+            let dsum = ids.size * d;
             let sum = bsum + dsum;
             let result = `共计 ${sum.toFixed(3)}/h (${(sum * 24).toFixed(3)}/d)：体积 ${bsum.toFixed(3)}/h (${(bsum * 24).toFixed(3)}/d)，数量 ${dsum.toFixed(1)}/h (${(dsum * 24).toFixed(1)}/d)`;
             if (warn > 0) {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainZ 生成 OpenCD 信息
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.2
+// @version      0.0.3
 // @description  MusicBrainZ 生成 OpenCD 所需信息
 // @author       lifegpc
 // @match        https://musicbrainz.org/release/*
@@ -86,7 +86,7 @@ GM_registerMenuCommand("生成 Info.txt", () => {
         for (const track of trackList) {
             const trackNo = parseInt(track.querySelector(".pos.t").innerText);
             const trackTitle = track.querySelector(".title bdi").innerText;
-            const trackArtist = track.children[2].innerText;
+            const trackArtist = track.children[2].classList.contains("rating") ? albumArtist : track.children[2].innerText;
             const trackLength = parseTime(track.querySelector(".treleases").innerText);
             discLength += trackLength;
             const tTrackLength = dumpTime(trackLength);

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainZ 生成 OpenCD 信息
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.1
+// @version      0.0.2
 // @description  MusicBrainZ 生成 OpenCD 所需信息
 // @author       lifegpc
 // @match        https://musicbrainz.org/release/*
@@ -11,18 +11,24 @@
 const typeI18n = {
     album: '专辑',
     single: '单曲',
+    soundtrack: '原声带',
 }
 const areaI18n = {
     japan: '日本',
 }
 const languageI18n = {
     japanese: '日语',
+    '[multiple languages]': '[多种语言]',
 }
 /**@param {string} type */
 function getTypeI18n(type) {
-    const t = type.toLowerCase();
-    const i = typeI18n[t];
-    return i ?? type;
+    const li = [];
+    const tmp = type.split(" + ");
+    for (const t of tmp) {
+        const i = typeI18n[t.toLowerCase()];
+        li.push(i ?? t);
+    }
+    return li.join(" + ")
 }
 function getAreaI18n(area) {
     const a = area.toLowerCase();

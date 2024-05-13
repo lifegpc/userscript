@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainZ 生成 OpenCD 信息
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.4
+// @version      0.0.5
 // @description  MusicBrainZ 生成 OpenCD 所需信息
 // @author       lifegpc
 // @match        https://musicbrainz.org/release/*
@@ -118,7 +118,7 @@ ${trackInfo}`
 })
 GM_registerMenuCommand("复制 BBCode", () => {
     const title = document.querySelector("h1 bdi").innerText;
-    const albumArtist = document.querySelector("p.subheader bdi").innerText;
+    const albumArtist = document.querySelector("p.subheader").innerText.match(/Release by (.+) (\(see all versions of this release, \d+ available\))?$/)[1];
     const albumFormat = document.querySelector('#sidebar dd.format').innerText;
     const albumType = document.querySelector('#sidebar dd.type').innerText;
     const area = document.querySelector('#sidebar a[href^="/area/"] bdi').innerText;

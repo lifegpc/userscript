@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainZ 生成 OpenCD 信息
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.5
+// @version      0.0.6
 // @description  MusicBrainZ 生成 OpenCD 所需信息
 // @author       lifegpc
 // @match        https://musicbrainz.org/release/*
@@ -19,6 +19,7 @@ const areaI18n = {
 const languageI18n = {
     japanese: '日语',
     '[multiple languages]': '[多种语言]',
+    english: '英语',
 }
 /**@param {string} type */
 function getTypeI18n(type) {
@@ -100,7 +101,7 @@ GM_registerMenuCommand("生成 Info.txt", () => {
         if (discList.length > 1) {
             discInfo += "\n";
             const discId = disc.querySelector("thead th a").id.replace("disc", "Disc ");
-            trackInfo += `${discId} ${dumpTime(discLength)}\n`;
+            trackInfo += `${discId} (${dumpTime(discLength)})\n`;
         }
         trackInfo += discInfo;
     }

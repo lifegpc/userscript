@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MusicBrainZ 生成 OpenCD 信息
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.6
+// @version      0.0.7
 // @description  MusicBrainZ 生成 OpenCD 所需信息
 // @author       lifegpc
 // @match        https://musicbrainz.org/release/*
@@ -12,6 +12,7 @@ const typeI18n = {
     album: '专辑',
     single: '单曲',
     soundtrack: '原声带',
+    compilation: '合辑',
 }
 const areaI18n = {
     japan: '日本',

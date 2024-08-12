@@ -282,12 +282,6 @@
             url[url.length - 1] !== '/' && (url += '/')
             const username = this.pluginInputs['username'].val().trim()
             const password = this.pluginInputs['password'].val().trim()
-            const methodDict = {
-                PROPFIND: 207,
-                GET: 200,
-                PUT: 201,
-                DELETE: 204
-            }
             this.buttons.forEach(button => button.$el.attr('disabled', true))
             return new Promise((resolve, reject) => {
                 GM_xmlhttpRequest({
@@ -301,7 +295,7 @@
                     ...config,
                     onload: response => {
                         this.buttons.forEach(button => button.$el.removeAttr('disabled'))
-                        if (response.status === methodDict[method]) {
+                        if (response.status>=200&&response.status<300) {
                             resolve(response)
                         } else {
                             if (method == 'GET' && response.status == 404) {

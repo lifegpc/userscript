@@ -9,7 +9,7 @@
 // @match        *://ngabbs.com/*
 // @match        *://nga.178.com/*
 // @match        *://g.nga.cn/*
-// @require      https://cdn.staticfile.org/blueimp-md5/2.19.0/js/md5.min.js
+// @require      https://unpkg.com/blueimp-md5@2.19.0/js/md5.min.js
 // @run-at       document-start
 // @inject-into  page
 // ==/UserScript==

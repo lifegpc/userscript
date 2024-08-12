@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NGA优化摸鱼体验插件-自动同步数据
 // @namespace    https://github.com/lifegpc/userscript/tree/master/NGA_BBS_plugins/AutoSyncData
-// @version      1.0.3
+// @version      1.0.4
 // @author       lifegpc
 // @description  通过WebDAV自动同步数据
 // @license      MIT
@@ -295,7 +295,7 @@
                     ...config,
                     onload: response => {
                         this.buttons.forEach(button => button.$el.removeAttr('disabled'))
-                        if (response.status>=200&&response.status<300) {
+                        if (response.status >= 200 && response.status < 300) {
                             resolve(response)
                         } else {
                             if (method == 'GET' && response.status == 404) {

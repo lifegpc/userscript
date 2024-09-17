@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.15
+// @version      0.1.16
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -16,6 +16,7 @@
 // @match        https://*.e-hentai.org/tag/*
 // @match        https://*.e-hentai.org/uploader/*
 // @match        https://*.e-hentai.org/mytags
+// @match        https://*.e-hentai.org/toplist.php?*
 // @match        https://*.exhentai.org/g/*/*
 // @match        https://*.exhentai.org/
 // @match        https://*.exhentai.org/?*
@@ -448,6 +449,7 @@ GM_addStyle(`
 .egs__msg-warn{background:#FF9900}
 td.tc{text-wrap:nowrap}
 .tippy-content p{white-space:break-spaces;color:black!important}
+div[id^="tippy-"]{opacity:initial!important}
 `)
 GM_addStyle(GM_getResourceText("s"));
 /**

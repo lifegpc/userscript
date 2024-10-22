@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EH Gallery Script
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.1.16
+// @version      0.1.17
 // @description  :(
 // @author       lifegpc
 // @match        https://*.e-hentai.org/g/*/*
@@ -373,42 +373,6 @@ async function fetch_tags() {
         }
     }
 }
-GM_config.init({
-    id: 'e-hentai',
-    fields: {
-        openImageInNewTab: {
-            type: 'checkbox',
-            label: 'Open image in new tab.',
-            default: true
-        },
-        openGalleryInNewTab: {
-            type: 'checkbox',
-            label: 'Open gallery in new tab.',
-            default: true
-        },
-        openMPVInNewTab: {
-            type: 'checkbox',
-            label: 'Open Multi-Page Viewer in new tab.',
-            default: true
-        },
-        enableTagTranslation: {
-            type: 'checkbox',
-            label: 'Enable tag translation.',
-            default: true
-        },
-        loadRefererImages: {
-            type: 'radio',
-            label: 'How to load referer needed images:',
-            options: ['GM_xmlhttpRequest', 'remove'],
-            default: 'remove'
-        }
-    },
-    events: {
-        save: (values) => {
-            handle_doc();
-        }
-    }
-});
 async function handle_doc() {
     let openImageInNewTab = GM_config.get("openImageInNewTab");
     let openGalleryInNewTab = GM_config.get("openGalleryInNewTab");
@@ -774,6 +738,44 @@ async function handle_tags() {
     }
 }
 window.addEventListener('DOMContentLoaded', async () => {
-    await handle_doc();
-    observer.observe(document.body, { childList: true, subtree: true,  });
+    GM_config.init({
+        id: 'e-hentai',
+        fields: {
+            openImageInNewTab: {
+                type: 'checkbox',
+                label: 'Open image in new tab.',
+                default: true
+            },
+            openGalleryInNewTab: {
+                type: 'checkbox',
+                label: 'Open gallery in new tab.',
+                default: true
+            },
+            openMPVInNewTab: {
+                type: 'checkbox',
+                label: 'Open Multi-Page Viewer in new tab.',
+                default: true
+            },
+            enableTagTranslation: {
+                type: 'checkbox',
+                label: 'Enable tag translation.',
+                default: true
+            },
+            loadRefererImages: {
+                type: 'radio',
+                label: 'How to load referer needed images:',
+                options: ['GM_xmlhttpRequest', 'remove'],
+                default: 'remove'
+            }
+        },
+        events: {
+            save: (values) => {
+                handle_doc();
+            },
+            init: async () => {
+                await handle_doc();
+                observer.observe(document.body, { childList: true, subtree: true });
+            }
+        }
+    });
 })

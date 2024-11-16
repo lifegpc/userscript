@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         filebrowser 获取aria2下载命令行
 // @namespace    https://github.com/lifegpc/userscript
-// @version      0.0.1
+// @version      0.0.2
 // @description  filebrowser 获取aria2下载命令行
 // @author       lifegpc
-// @match        https://lfiles.lifegpc.com/files/*
-// @match        https://ptf.lifegpc.com/files/*
+// @match        https://lfiles.lifegpc.com/*
+// @match        https://ptf.lifegpc.com/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
